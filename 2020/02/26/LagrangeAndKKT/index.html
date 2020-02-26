@@ -6,21 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>我的第一篇博客文章 | Hexo</title>
+  <title>LagrangeAndKKT | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="我的博客文章编写">
+  <meta name="description" content="拉格朗日乘子法及KKT条件理解">
 <meta property="og:type" content="article">
-<meta property="og:title" content="我的第一篇博客文章">
-<meta property="og:url" content="http://yoursite.com/2020/02/23/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0/index.html">
+<meta property="og:title" content="LagrangeAndKKT">
+<meta property="og:url" content="http://yoursite.com/2020/02/26/LagrangeAndKKT/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="我的博客文章编写">
+<meta property="og:description" content="拉格朗日乘子法及KKT条件理解">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://pic21.nipic.com/20120525/8956325_100544942000_2.jpg">
-<meta property="article:published_time" content="2020-02-23T12:15:48.000Z">
-<meta property="article:modified_time" content="2020-02-23T13:14:56.547Z">
+<meta property="article:published_time" content="2020-02-26T03:49:35.972Z">
+<meta property="article:modified_time" content="2020-02-26T03:50:33.740Z">
 <meta property="article:author" content="John Smith">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://pic21.nipic.com/20120525/8956325_100544942000_2.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -169,54 +167,49 @@
           </div>
           <div id="js-content" class="content-ll">
             
-<article id="post-我的第一篇博客文章" class="article article-type-post " itemscope itemprop="blogPost">
+<article id="post-LagrangeAndKKT" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      我的第一篇博客文章
+      LagrangeAndKKT
     </h1>
   
 
         
-        <a href="/2020/02/23/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0/" class="archive-article-date">
-  	<time datetime="2020-02-23T12:15:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-23</time>
+        <a href="/2020/02/26/LagrangeAndKKT/" class="archive-article-date">
+  	<time datetime="2020-02-26T03:49:35.972Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-26</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="我的博客文章编写"><a href="#我的博客文章编写" class="headerlink" title="我的博客文章编写"></a>我的博客文章编写</h1><a id="more"></a>
-<h2 id="标题"><a href="#标题" class="headerlink" title="标题"></a>标题</h2><p>使用标题时需要使用#号  </p>
-<h2 id="段落"><a href="#段落" class="headerlink" title="段落"></a>段落</h2><p>这是第一个段落内容</p>
-<p>这是第二个段落内容  </p>
-<h2 id="区块引用"><a href="#区块引用" class="headerlink" title="区块引用"></a>区块引用</h2><blockquote>
-<p>这是一段引用段落，将会被高亮显示  </p>
-<h2 id="超链接"><a href="#超链接" class="headerlink" title="超链接"></a>超链接</h2><p>[百度]<a href="https://www.baidu.com/" target="_blank" rel="noopener">https://www.baidu.com/</a>  </p>
-<h2 id="图片"><a href="#图片" class="headerlink" title="图片"></a>图片</h2><p><img src="http://pic21.nipic.com/20120525/8956325_100544942000_2.jpg" alt="风景">  </p>
-<h2 id="无序列表"><a href="#无序列表" class="headerlink" title="无序列表"></a>无序列表</h2><ul>
-<li>无序列表项</li>
-<li>无序列表项</li>
-<li>无序列表项  <h2 id="有序列表"><a href="#有序列表" class="headerlink" title="有序列表"></a>有序列表</h2></li>
-</ul>
-<ol>
-<li>有序列表项1</li>
-<li>有序列表项2</li>
-<li>有序列表项3 <h2 id="分隔线"><a href="#分隔线" class="headerlink" title="分隔线"></a>分隔线</h2></li>
-</ol>
-<h2 id="—"><a href="#—" class="headerlink" title="—- "></a>—- </h2><hr>
-<hr>
-<hr>
-</blockquote>
-<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=28815250&auto=0&height=66"></iframe>
-
-
-
-
-
+        <h1 id="拉格朗日乘子法及KKT条件理解"><a href="#拉格朗日乘子法及KKT条件理解" class="headerlink" title="拉格朗日乘子法及KKT条件理解"></a>拉格朗日乘子法及KKT条件理解</h1><a id="more"></a>
+<p>我们只考虑不等式约束下的优化问题，如:</p>
+<script type="math/tex; mode=display">
+minf(x)</script><script type="math/tex; mode=display">
+s.t.g(x)\leq0</script><p>这里$x$是多维的向量，约束不等式$g(x)\leq0$表示的是多维空间上的一个区域，因此我们定义可行性域$K={x\in R^n|g(x)\leq0}$  。假设$x^*$为满足约束条件的最佳解，那么我们可以分成两种情况讨论，而这两种情况的最佳解具有不同的必要条件。 </p>
+<p>$(1)$ $g(x)\leq0$ ，最佳解位于$K$的内部，称为内部解，这时约束条件是无效的，$g(x)$不起作用，约束优化退化为无约束优化，因此驻点$x^*$满足$\nabla f =0$ ，且因为是无条件约束，没有必要使用$g(x)$所以拉格朗日乘数法中的$\lambda=0$。</p>
+<p>$(2)$ $g(x)=0$ ，最佳解落在$K$的边界上，称为边界解，此时约束条件是有效的，不等式约束变成等式约束$g(x)=0$，利用拉格朗日乘数法可得存在$\lambda$使得$\nabla f=-\lambda\nabla g$。因为我们希望最小化$f$，梯度$\nabla f($函数$f(x)$在$x$处的最陡上升方向)应指向可行性域$K$的内部(因为你的最优解最小值是在边界取得的，如果函数$f(x)$的梯度不是这样的指向，说明边界内有更小的值，这就和最优解最小值是在边界取得的相矛盾了!)，但$\nabla g$指向$K$的外部(即$g(x)&gt;0$的区域，因为梯度方向总是指向使函数增大最快的方向)且必与$\nabla f$方向相反，因此，$\lambda\ge0$，这称为对偶可行性。</p>
+<p>综合以上两种情况我们有：</p>
+<script type="math/tex; mode=display">
+\left\{
+    \begin{array}{c}
+        内部解时，\lambda=0，使得 \lambda g(x)=0\\
+        边界解时，g(x)=0，使得 \lambda g(x)=0\\
+    \end{array}
+\right.</script><p>因此，无论是内部解或边界解，$\lambda g(x)=0$恒成立，这称为互补松弛性。再综合所有的情况我们可以得到不等式约束下最佳解的必要条件为：</p>
+<script type="math/tex; mode=display">
+\left\{
+    \begin{array}{c}
+        g(x)\leq0\\
+        \lambda\ge0\\
+        \lambda g(x)=0
+    \end{array}
+\right.</script><p>此即为KKT条件。</p>
 
       
 
@@ -306,7 +299,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://JohnSmithDoc.github.io/2020/02/23/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0/" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://JohnSmithDoc.github.io/2020/02/26/LagrangeAndKKT/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -320,18 +313,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2020/02/26/LagrangeAndKKT/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          LagrangeAndKKT
-        
-      </div>
-    </a>
   
-  
-    <a href="/2020/02/23/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">Hello World</div>
+    <a href="/2020/02/23/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">我的第一篇博客文章</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -358,7 +342,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#我的博客文章编写"><span class="toc-number">1.</span> <span class="toc-text">我的博客文章编写</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#标题"><span class="toc-number">1.1.</span> <span class="toc-text">标题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#段落"><span class="toc-number">1.2.</span> <span class="toc-text">段落</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#区块引用"><span class="toc-number">1.3.</span> <span class="toc-text">区块引用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#超链接"><span class="toc-number">1.4.</span> <span class="toc-text">超链接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#图片"><span class="toc-number">1.5.</span> <span class="toc-text">图片</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#无序列表"><span class="toc-number">1.6.</span> <span class="toc-text">无序列表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#有序列表"><span class="toc-number">1.7.</span> <span class="toc-text">有序列表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分隔线"><span class="toc-number">1.8.</span> <span class="toc-text">分隔线</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#—"><span class="toc-number">1.9.</span> <span class="toc-text">—- </span></a></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#拉格朗日乘子法及KKT条件理解"><span class="toc-number">1.</span> <span class="toc-text">拉格朗日乘子法及KKT条件理解</span></a></li></ol>
                     </div>
                 </span>
             </div>
