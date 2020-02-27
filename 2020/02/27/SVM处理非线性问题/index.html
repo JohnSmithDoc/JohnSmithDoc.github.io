@@ -6,14 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: 随笔 | Hexo</title>
+  <title>SVM处理非线性问题理解 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/tags/%E9%9A%8F%E7%AC%94/index.html">
+  <meta name="description" content="SVM处理非线性问题理解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SVM处理非线性问题理解">
+<meta property="og:url" content="http://yoursite.com/2020/02/27/SVM%E5%A4%84%E7%90%86%E9%9D%9E%E7%BA%BF%E6%80%A7%E9%97%AE%E9%A2%98/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="SVM处理非线性问题理解">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-02-27T03:15:57.252Z">
+<meta property="article:modified_time" content="2020-02-27T03:50:52.938Z">
 <meta property="article:author" content="东边有棵树">
+<meta property="article:tag" content="随笔">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -164,35 +169,123 @@
           </div>
           <div id="js-content" class="content-ll">
             
+    <i class="fa fa-thumb-tack"></i>
+    <font color=7D26CD>置顶</font>
+    <span class="post-meta-divider">|</span>
   
+<article id="post-SVM处理非线性问题" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/02/27/SVM%E5%A4%84%E7%90%86%E9%9D%9E%E7%BA%BF%E6%80%A7%E9%97%AE%E9%A2%98/" class="archive-article-date">
+    <h1 class="article-title" itemprop="name">
+      SVM处理非线性问题理解
+    </h1>
+  
+
+
+        <!--显示阅读次数-->
+        
+          <br/>
+          <a class="cloud-tie-join-count" href="javascript:void(0);" style="color:gray;font-size:14px;">
+          <span class="icon-sort"></span>
+          <span id="busuanzi_container_page_pv" style="color:#ef7522;font-size:14px;">
+                    阅读数: <span id="busuanzi_value_page_pv"></span>次 &nbsp;&nbsp;
+          </span>
+          </a>
+        
+        <!--显示阅读次数完毕-->
+
+        
+        <a href="/2020/02/27/SVM%E5%A4%84%E7%90%86%E9%9D%9E%E7%BA%BF%E6%80%A7%E9%97%AE%E9%A2%98/" class="archive-article-date">
   	<time datetime="2020-02-27T03:15:57.252Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-27</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/02/27/SVM%E5%A4%84%E7%90%86%E9%9D%9E%E7%BA%BF%E6%80%A7%E9%97%AE%E9%A2%98/">SVM处理非线性问题理解</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="SVM处理非线性问题理解"><a href="#SVM处理非线性问题理解" class="headerlink" title="SVM处理非线性问题理解"></a>SVM处理非线性问题理解</h1><a id="more"></a>
+<h2 id="1-利用核函数"><a href="#1-利用核函数" class="headerlink" title="(1)利用核函数"></a>(1)利用核函数</h2><p>在现实任务中，原始样本空间也许并不存在一个能正确划分两类样本的超平面，那这个时候应该怎么办呢？我们的想法是仍然去找平面，但我们去更高的纬度里去找平面。在低维空间里一些线性不可分的数据集，到高维空间里面将会以更大的概率被线性分开。有人证明，在特征空间中随机的选取一些点，同时随机的将这些点分成两类，那么在越高维度的空间里进行这个操作，这些点能被线性分开的概率越大。如果说你在无限的维度里面进行这个操作，那么这些点能被线性分开的概率为1。</p>
+<p>我们定义一个映射$\varphi$，将低维矢量$X$映射至高维去，即：</p>
+<script type="math/tex; mode=display">
+X\rightarrow\varphi(X)</script><p>其中，$\varphi(X)$ 是更高维的矢量。那么我们应该如何选取这个$\varphi$呢，这应该是SVM最有创造力的部分之一:</p>
+<ul>
+<li><p>$\varphi(X)$ 取无限维(当然不无限有时也能操作)，但同时使用有限维的操作。</p>
+</li>
+<li><p>我们可以不用知道 $\varphi(X)$ 的显示表达，取而代之，如果对空间任意向量，我们知道一个低维的核函数</p>
+<p>$K(X_1,X_2)=\varphi(X_1)^T\varphi(X_2)$，则仍然能通过SVM，计算$W^T\varphi(X)+b$ 的值，进而得出$X$所属的类别。 </p>
+</li>
+</ul>
+<p>当然，什么样的函数可以作为核函数是有条件的，此处不作说明，有兴趣的同学可以参阅西瓜书支持向量机那一章。SVM最常用的核函数是如下2个：</p>
+<script type="math/tex; mode=display">
+K(X_1,X_2)=e^{-\frac{||X_1-X_2||^2}{2\sigma^2}}</script><script type="math/tex; mode=display">
+K(X_1,X_2)=(X_1^TX_2+1)^d</script><h2 id="2-软间隔和正则化"><a href="#2-软间隔和正则化" class="headerlink" title="(2)软间隔和正则化"></a>(2)软间隔和正则化</h2><p>在现实任务中，往往很难确定合适的核函数使得训练样本在特征空间中线性分开。即如果我们硬要求找一个平面将所有样本正确划分，那最终结果很可能是我们找不到这样一个平面，因为条件太苛刻了，退而求其次，我们降低要求。原先我们要求所有样本必须满足以下关系(硬间隔)：</p>
+<script type="math/tex; mode=display">
+y_i[W^TX+b]\ge1 (i=1\cdots N)</script><p>现在我们允许某些样本不满足上述约束，于是我们将约束条件改写为(软间隔)：</p>
+<script type="math/tex; mode=display">
+\left\{
+    \begin{array}{c}
+        y_i[W^TX+b]\ge1-\xi_i~~(i=1\cdots N)\\
+        \xi_i\ge0~~(i=1\cdots N)\\
 
-        <div class="article-info info-on-right">
-          
+    \end{array}
+\right.</script><p>同时为了使不满足约束的样本尽可能少，我们将优化目标改写为：</p>
+<script type="math/tex; mode=display">
+min\left\{\frac{1}{2}||W||^2+C\sum_{i=1}^N\xi_i\right\}</script><p>当然目标函数的改写不止这一种方式，可以通过尝试不同的改写方式，来达到不同的效果。其中</p>
+<script type="math/tex; mode=display">
+C\sum_{i=1}^N\xi_i</script><p>称作正则项。$\xi_i$称作松弛变量，用以表征该样本不满足约束的程度。$C$是事先设定的参数，根据经验来调试。从这个方面来看，SVM还是很好的，因为事先需要调试的参数并不算多。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>从以上来看，利用SVM处理非线性问题主要用到了两种方法：</p>
+<ol>
+<li><strong>到更高维度去找可以分类的超平面。</strong></li>
+<li><strong>有限制地降低分类要求。</strong> </li>
+</ol>
+<p>当然，这两种方法可以结合使用来达到更好的效果。</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/alipay.jpg">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/wechat.jpg">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+        <div class="article-pop-out tagcloud">
+          <i class="icon-tuding"></i>
+          <a class="article-tag-list-link color3">置顶</a>
+        </div>
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -204,133 +297,119 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://JohnSmithDoc.github.io/2020/02/27/SVM%E5%A4%84%E7%90%86%E9%9D%9E%E7%BA%BF%E6%80%A7%E9%97%AE%E9%A2%98/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/02/26/LagrangeAndKKT/" class="archive-article-date">
-  	<time datetime="2020-02-26T03:49:35.972Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-26</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2020/02/26/LagrangeAndKKT/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Lagrange And KKT</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/02/26/LagrangeAndKKT/">Lagrange And KKT</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#SVM处理非线性问题理解"><span class="toc-number">1.</span> <span class="toc-text">SVM处理非线性问题理解</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-利用核函数"><span class="toc-number">1.1.</span> <span class="toc-text">(1)利用核函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-软间隔和正则化"><span class="toc-number">1.2.</span> <span class="toc-text">(2)软间隔和正则化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">1.3.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/02/23/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0/" class="archive-article-date">
-  	<time datetime="2020-02-23T12:15:48.989Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-23</time>
-</a>
-        </div>
-    	 
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/02/23/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0/">我的第一篇博客文章</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/02/23/hello-world/" class="archive-article-date">
-  	<time datetime="2020-02-23T10:47:06.452Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-23</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/02/23/hello-world/">Hello World</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
-    
+  
 
 
           </div>
@@ -356,9 +435,9 @@
 	var yiliaConfig = {
 		mathjax: true,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
