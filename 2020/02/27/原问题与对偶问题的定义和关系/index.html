@@ -220,7 +220,7 @@ L(w,\alpha,\beta)=f(w)+ \sum_{i=1}^K\alpha_ig_i(w)+\sum_{i=1}^M\beta_ih_i(w)\tag
 <script type="math/tex; mode=display">
 L(w,\alpha,\beta)=f(w)+\alpha^Tg(w)+\beta^Th(w) \tag{3}</script><p>公式$(3)$中$\alpha^T$和$g(w)$都是$K$维的，而$\beta^T$和$h(w)$都是$M$维的。则原问题的对偶问题为：</p>
 <script type="math/tex; mode=display">
-最大化\quad\theta(\alpha,\beta)=\inf \limits_{所有w}\{~L(w,\alpha,\beta)~\}\\限制条件：\alpha_i~\ge~0\quad(i=1\cdots K)\tag{4}</script><p>其中$\inf \limits_{所有w}{~L(w,\alpha,\beta)~}$的意思是在限制$\alpha$和$\beta$的情况下遍历所有的$w$求最小值，即每确定一个$\alpha$和$\beta$都能算出一个最小值，即每一个$\alpha$和$\beta$都对应一个值，很明显，这是$\alpha$和$\beta$的函数，故写作$\theta(\alpha,\beta)$。那么公式$(4)$是针对所有的$\alpha$和$\beta$求最大值，即在所有的最小值中找最大的。 </p>
+最大化\quad\theta(\alpha,\beta)=\inf \limits_{所有w}\{~L(w,\alpha,\beta)~\}\\限制条件：\alpha_i~\ge~0\quad(i=1\cdots K)\tag{4}</script><p>其中$\inf \limits_{所有w}\{~L(w,\alpha,\beta)~\}$的意思是在限制$\alpha$和$\beta$的情况下遍历所有的$w$求最小值，即每确定一个$\alpha$和$\beta$都能算出一个最小值，即每一个$\alpha$和$\beta$都对应一个值，很明显，这是$\alpha$和$\beta$的函数，故写作$\theta(\alpha,\beta)$。那么公式$(4)$是针对所有的$\alpha$和$\beta$求最大值，即在所有的最小值中找最大的。 </p>
 <h2 id="2-原问题和对偶问题的关系"><a href="#2-原问题和对偶问题的关系" class="headerlink" title="(2)原问题和对偶问题的关系"></a>(2)原问题和对偶问题的关系</h2><p>定理：如果$w^\ast$是原问题的解，而$\alpha^\ast$和$\beta^\ast$是对偶问题的解，则有：</p>
 <script type="math/tex; mode=display">
 f(w^*)\ge\theta(\alpha^*,\beta^*)\tag{5}</script><p>定理证明如下：</p>
