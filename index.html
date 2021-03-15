@@ -754,6 +754,237 @@
 
 
   
+    <article id="post-固定翼路径跟踪L1导航算法" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/15/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%AF%BC%E8%88%AA%E7%AE%97%E6%B3%95/">固定翼路径跟踪L1导航算法</a>
+    </h1>
+  
+
+
+        <!--显示阅读次数-->
+        
+        <!--显示阅读次数完毕-->
+
+        
+        <a href="/2021/03/15/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%AF%BC%E8%88%AA%E7%AE%97%E6%B3%95/" class="archive-article-date">
+  	<time datetime="2021-03-15T14:47:31.065Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="固定翼路径跟踪L1导航算法"><a href="#固定翼路径跟踪L1导航算法" class="headerlink" title="固定翼路径跟踪L1导航算法"></a>固定翼路径跟踪L1导航算法</h1><p>当前PX4、Ardupilot中固定翼路径跟随算法主要基于L1导航算法实现</p>
+<p><img src="https://camo.githubusercontent.com/c8bbdff5f40d1e2a0ee06174a504ab9dbd313b85a263e93abaa3373fd848a05b/68747470733a2f2f662e636c6f75642e6769746875622e636f6d2f6173736574732f323035343537382f3139303034302f34333662333061652d376563342d313165322d393061372d3031666365383731373339322e706e67" alt="img"></p>
+<p><img src="https://camo.githubusercontent.com/59d699e76b157eedacdbe7a39c760ee70f4c1d2c0f77674d85513f76089e541b/68747470733a2f2f662e636c6f75642e6769746875622e636f6d2f6173736574732f323035343537382f3139303035392f66643535396233652d376563352d313165322d383538342d6432316532643831663935322e706e67" alt="img"></p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>问题：存在目标航点B，期望的航线AB，其中A为上一个航点，B为当前目标航点，飞机位置在P点，如何使飞机一边贴近AB航线一边向B点靠近？</p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307141150660.png" alt="image-20210307141150660"></p>
+<p>正常飞行中，飞机的位置P应该在AB的连线上，但由于某种扰动（如风的干扰），或者初始条件（飞机起飞时就不在AB航线上）导致飞机偏离了原本的AB航线，此时飞机要飞到B点，有如下两种方式：</p>
+<ul>
+<li>从当前P点直接朝B点飞行，飞图中直红线</li>
+<li>逐渐切入AB航线，尽量压着航向飞向B点</li>
+</ul>
+<p>实际飞行中，航点的选择可能本身是要绕开部分障碍物，假设P点和B点之间有障碍物，这时直飞B点的方案就不可行了，我们想要飞机尽快切入AB航线，沿着AB航线飞行。L1算法就是解决该问题一个比较好的方案。</p>
+<h2 id="符号说明"><a href="#符号说明" class="headerlink" title="符号说明"></a>符号说明</h2><script type="math/tex; mode=display">
+V----速度矢量\\
+L_1----连接飞行器位置和目标路径上参考点的线段\\
+\eta----从V到L_1的角度(顺时针方向为正)\\
+a_{s_{cmd}}----横向加速度指令，与飞行器速度方向垂直\\
+d----航迹误差，飞行器当前位置距航线的垂直距离\\
+R----圆或者圆弧的半径\\</script><h2 id="初探L1制导律"><a href="#初探L1制导律" class="headerlink" title="初探L1制导律"></a>初探L1制导律</h2><p>L1制导律在目标路径上选择一个参考点，利用该参考点给出一个横向加速度指令$a_{s_{cmd}}$来使飞机的潜在路径实时经过参考点。飞机位置和参考点的连线即为L1，这也是L1制导律名字来源。之后的公式和主要图片来源于如下论文：<a href="http://acl.mit.edu/papers/gnc_park_deyst_how.pdf" target="_blank" rel="noopener">http://acl.mit.edu/papers/gnc_park_deyst_how.pdf</a></p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307144823658.png" alt="image-20210307144823658"></p>
+<p>横向加速度计算如下：</p>
+<script type="math/tex; mode=display">
+sin(\eta)=\frac{0.5L_1}{R}
+\\a_{s_{cmd}} = \frac{V^2}{R}=\frac{V^2}{\frac{L_1}{2sin(\eta)}}=2\frac{V^2}{L_1}sin(\eta)</script><p>通过实时更新参考点位置就可以实时更新$a_{s_{cmd}}$来使得飞行器的轨迹逐渐切入目标路径：</p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307153233904.png" alt="image-20210307153233904"></p>
+<p>上面的离散点表示中可以看到，飞行器总是趋向于<strong>速度方向</strong>和<strong>L1线段方向</strong>对齐，而<strong>L1线段</strong>逐渐和<strong>目标路径</strong>对齐，进而间接带动飞行器最终速度方向也和目标路径对齐。最终飞回至直线上去，会变为如下情况：</p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307154124177.png" alt="image-20210307154124177"></p>
+<p>这也可以从加速度方向看出，当$\eta$大于0时，会产生向右加速的指令，来使飞行器速度方向对齐L1，$\eta$小于0时同理。</p>
+<h2 id="两种情形下的L1制导律"><a href="#两种情形下的L1制导律" class="headerlink" title="两种情形下的L1制导律"></a>两种情形下的L1制导律</h2><p>固定翼实际飞行中的路径跟踪主要可分为两种情况：</p>
+<ol>
+<li>跟踪一条直线（常见）</li>
+<li>跟踪一条圆形路径</li>
+</ol>
+<h3 id="弹簧质量阻尼系统"><a href="#弹簧质量阻尼系统" class="headerlink" title="弹簧质量阻尼系统"></a>弹簧质量阻尼系统</h3><p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307170300355.png" alt="image-20210307170300355"></p>
+<p>作简单的受力分析可得到：</p>
+<script type="math/tex; mode=display">
+ma=m\ddot{x}=F-Kx-B\dot{x}</script><p>即：</p>
+<script type="math/tex; mode=display">
+m\ddot{x} + B\dot{x}+Kx = F</script><p>整理一下：</p>
+<script type="math/tex; mode=display">
+\ddot{x}+\frac{B}{m}\dot{x}+\frac{K}{m}x=\frac{F}{m}</script><p>定义$\omega_n = \sqrt{\frac{K}{m}}$，称为固有频率，$\zeta=\frac{B}{2\sqrt{Km}}$，称为阻尼比，当没有外力时，即F为0，这时上式就可以写成：</p>
+<script type="math/tex; mode=display">
+\ddot{x}+2\zeta\omega_n\dot{x}+{\omega_n^2}x=0</script><p>该微分方程特征方程为：</p>
+<script type="math/tex; mode=display">
+\lambda^2+2\zeta\omega\lambda+\omega_n^2 = 0</script><p>得到：</p>
+<script type="math/tex; mode=display">
+\lambda_1=-\zeta\omega_n+\omega_n \sqrt{\zeta^2-1}\\
+\lambda_2=-\zeta\omega_n-\omega_n \sqrt{\zeta^2-1}\\</script><p>这时，可以分以下几种情况：</p>
+<ul>
+<li><p>$\zeta&gt;1$，此时$0&lt;\sqrt{\zeta^2-1}&lt;\zeta$，$\lambda_1&lt;0,\lambda_2&lt;0$，此时微分方程的解为：$x(t)=C_1e^{\lambda_1t}+C_2e^{\lambda_2t}$，这时$x(t)$是直接收敛的</p>
+</li>
+<li><p>$\zeta=1$，此时$\lambda=\lambda_1=\lambda_2=-\omega_n$，此时微分方程的解为：$x(t)=(C_1+C_2t)e^{\lambda}t$,此时也是收敛的。</p>
+</li>
+<li><p>$0&lt;\zeta&lt;1$，此时$\lambda_1=-\zeta\omega_n+i\omega_n\sqrt{1-\zeta^2}$，$\lambda_2=-\zeta\omega_n-i\omega_n\sqrt{1-\zeta^2}$，这是一对共轭复根，此时微分方程的解可以写成：</p>
+<script type="math/tex; mode=display">
+x(t)=e^{-\zeta\omega_nt}(C_1cos\omega_n\sqrt{1-\zeta^2}t+C_2sin\omega_n\sqrt{1-\zeta^2}t)\\
+=e^{-\zeta\omega_nt}\sqrt{C_1^2+C_2^2}sin(\omega_dt+\phi)</script><p>其中$\omega_d$称为阻尼固有频率。</p>
+</li>
+<li><p>$\zeta=0$，此时微分方程的解为：$x(t)=\sqrt{C_1^2+C_2^2}sin(\omega_nt+\phi)$，这时一个正弦函数，频率就是无阻尼自然频率$\omega_n$。</p>
+</li>
+<li><p>$\zeta&lt;0$，发散。</p>
+</li>
+</ul>
+<p>在初始条件不为0时，没有外力输入，则不同的阻尼比会有不同的响应，假设初始的$x=x_0$，$\dot{x}=0$，其实就相当于手将质量块M向右拉动值$x_0$处，然后松手，看$x$如何变化。以阻尼比的不同可有如下响应情况：</p>
+<ul>
+<li>$\zeta&gt;1$，过阻尼：</li>
+<li><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307171942364.png" alt="image-20210307171942364"></li>
+<li>$\zeta=1$，临界阻尼：<img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307172050571.png" alt="image-20210307172050571"></li>
+<li>$0&lt;\zeta&lt;1$，欠阻尼，这个振动的频率就是$\omega_d$：<img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307172212494.png" alt="image-20210307172212494"></li>
+<li>$\zeta=0$，无阻尼，此时这个正弦的频率就是$\omega_n$：<img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307172318001.png" alt="image-20210307172318001"></li>
+<li>$-1&lt;\zeta&lt;0$，这种情况就直接发散了。</li>
+</ul>
+<h3 id="一、跟踪一条直线"><a href="#一、跟踪一条直线" class="headerlink" title="一、跟踪一条直线"></a>一、跟踪一条直线</h3><p>仍统一使用之前的符号说明，假设$\eta$角很小，这在航路飞行中的大部分时间都是满足的。</p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307160303660.png" alt="image-20210307160303660"></p>
+<p>由于$\eta$很小，所以：</p>
+<script type="math/tex; mode=display">
+sin(\eta)\approx\eta=\eta_1+\eta_2</script><p>而且由于$\eta_1$和$\eta_2$很小，所以有：</p>
+<script type="math/tex; mode=display">
+\eta_1 \approx\sin(\eta_1)=\frac{d}{L_1}\\
+\eta_2 \approx\sin(\eta_2)=\frac{\dot{d}}{V}\\</script><p>综合上面有：</p>
+<script type="math/tex; mode=display">
+\\a_{s_{cmd}}  =2\frac{V^2}{L_1}sin(\eta)=2\frac{V^2}{L_1}(\frac{d}{L_1}+\frac{\dot{d}}{V})=2\frac{V}{L_1}(\dot{d}+\frac{V}{L_1}d)</script><p>可以看到通过线性化之后，直线路径跟踪的L1制导律可以近似为一个PD控制器，来控制航迹误差。我们假设不考虑内环动力学，如不考虑内环滚转角控制器通过滚转角产生横向加速度的动力学延迟等，我们认为横向加速度是瞬间产生的，同时假设了$\eta_2$很小，则有：</p>
+<script type="math/tex; mode=display">
+a_{s_{cmd}} = - \ddot{d}</script><p>进而可写成到：</p>
+<script type="math/tex; mode=display">
+\ddot{d}+2\zeta\omega_n\dot{d}+{\omega_n^2}d=0</script><p>其中$\zeta = \frac{1}{\sqrt{2}}\approx0.707$，$\omega_n=\frac{\sqrt{2}V}{L_1}$，这表明直线跟踪情况</p>
+<h3 id="二、跟踪一条圆形路径"><a href="#二、跟踪一条圆形路径" class="headerlink" title="二、跟踪一条圆形路径"></a>二、跟踪一条圆形路径</h3><p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307182017793.png" alt="image-20210307182017793"></p>
+<p>圆弧路径跟踪情况如上图，假设$\eta_1$和$\eta_2$都很小，飞行器的当前位置取决于R+d和$\theta$，而$\psi$决定了飞行器当前速度矢量的方向。因为：</p>
+<script type="math/tex; mode=display">
+\psi+\eta_2=\theta+\frac{\pi}{2}</script><p>所以：</p>
+<script type="math/tex; mode=display">
+\dot{\psi}=\dot{\theta}-\dot{\eta_2}</script><p>由于$\eta_1$比较小，d也比较小，所以有：</p>
+<script type="math/tex; mode=display">
+\frac{L_1}{2}\approx\ Rsin(\eta_3)==>sin(\eta_3)=\frac{L_1}{2R}</script><p>定义：</p>
+<script type="math/tex; mode=display">
+c = cos(\eta_3)=\sqrt{1-{sin(\eta_3)}^2}\approx\ \sqrt{1-(\frac{L_1}{2R})^2}</script><p>基于上面小角度假设，位置误差的变化率就可表示为：</p>
+<script type="math/tex; mode=display">
+\dot{d}=Vsin(\eta_2)\approx\ V\eta_2</script><p>则：</p>
+<script type="math/tex; mode=display">
+\ddot{d}=V\dot{\eta_2}</script><p>因此横向加速度可表示为：</p>
+<script type="math/tex; mode=display">
+a_{s_{cmd}}=V\dot{\psi}=V\dot{\theta}-V\dot{\eta_2}=V\dot{\theta}-\ddot{d}</script><p>在$\eta_1$和$\eta_2$都很小的假设下：</p>
+<script type="math/tex; mode=display">
+V\dot{\theta}\approx\ \frac{V^2}{R}</script><p><strong>以上是以速度V绕半径R的圆所需要的向心加速度</strong>，则：</p>
+<script type="math/tex; mode=display">
+a_{s_{cmd}}\approx\ \frac{V^2}{R}-\ddot{d}</script><p>在$\eta_1$和$\eta_2$都很小的假设下</p>
+<script type="math/tex; mode=display">
+2\frac{V^2}{L_1}sin(\eta) = 2\frac{V^2}{L_1}sin(\eta_1+\eta_2+\eta_3)=2\frac{V^2}{L_1}[sin(\eta_1+\eta_2)cos(\eta_3)+cos(\eta_1+\eta_2)sin(\eta_3)]\\
+=2\frac{V^2}{L_1}[\eta_1cos(\eta_3)+\eta_2cos(\eta_3)+sin(\eta_3)]</script><p>其中：</p>
+<script type="math/tex; mode=display">
+\eta_1\approx\ \frac{dcos(\eta_3)}{L_1},\eta_2\approx\ \frac{\dot{d}}{V},c=cos(\eta_3)</script><p>于是化简可得：</p>
+<script type="math/tex; mode=display">
+2\frac{V^2}{L_1}sin(\eta) =a_{s_{cmd}}\approx\ \frac{V^2}{R}-\ddot{d} = \frac{2V^2c^2}{L_1^2}d+\frac{2Vc}{L_1}\dot{d}+\frac{V^2}{R}</script><p>于是又可得到：</p>
+<script type="math/tex; mode=display">
+\ddot{d}+2\zeta\omega_n\dot{d}+{\omega_n^2}d=0</script><p>其中：</p>
+<script type="math/tex; mode=display">
+\zeta=0.707,~~~~~~ \omega_n = \frac{\sqrt{2}Vc}{L_1}</script><p>可以看到，跟踪圆的情况也可以近似看成是一个简单二阶系统。</p>
+<h2 id="PX4中关于该算法的改进"><a href="#PX4中关于该算法的改进" class="headerlink" title="PX4中关于该算法的改进"></a>PX4中关于该算法的改进</h2><p>从上面的分析可以看出，L1制导算法可以看成一个典型的二阶系统，阻尼比是固定的0.707，自然频率$\omega_n$正比于飞行器速度与L1的比值，也就是说，如果L1是固定的，那么这个二阶系统的自然频率是随着飞行速度变化而变化的，这就不能保证飞机在任何速度下都能有良好的跟踪性能，所以px4中L1和V的比值是固定的，这样就可以保证系统的自然频率是固定的。</p>
+<p>同理，上面的计算也可以看出系统的阻尼比$\zeta$也是固定的，为0.707，但是实际飞行时，切向加速度达到期望值存在响应延迟时间，融合速度反馈也存在延迟，因此系统的阻尼比应可以调节，以满足考虑内环动力学系统之后整体系统阻尼比的要求。</p>
+<p>PX4中，调节L1控制系统阻尼比的参数为FW_L1_DAMPING，调节自然频率的参数为FW_L1_PERIOD，其实实际调试好系统姿态环参数之后，关于L1调试的参数重要的只有这两个参数，且这两个参数调节起来也异常简单。那么如何实现阻尼比和自然频率的修改呢，通过修改加速度增益参数即可。以直线跟踪为例：</p>
+<p>上面的推导中我们得到：</p>
+<script type="math/tex; mode=display">
+\\a_{s_{cmd}}  =2\frac{V^2}{L_1}sin(\eta)=2\frac{V}{L_1}(\dot{d}+\frac{V}{L_1}d)</script><p>增加加速度增益后，期望的横向加速度表示为：</p>
+<script type="math/tex; mode=display">
+a_{s_{cmd}}= K\frac{V^2}{L_1}sin(\eta)=K\frac{V}{L_1}(\dot{d}+\frac{V}{L_1}d)</script><p>又有：</p>
+<script type="math/tex; mode=display">
+a_{s_{cmd}}=-\ddot{d}</script><p>所以系统微分方程可写成如下形式：</p>
+<script type="math/tex; mode=display">
+\ddot{d}+K\frac{V}{L_1}\dot{d}+K\frac{V^2}{L_1^2}d = 0</script><p>对照二阶系统微分方程格式：</p>
+<script type="math/tex; mode=display">
+\ddot{d}+2\zeta\omega_n\dot{d}+{\omega_n^2}d=0</script><p>有：</p>
+<script type="math/tex; mode=display">
+2\zeta\omega_n=K\frac{V}{L_1}~~~~~~~ \omega_n^2 = K \frac{V^2}{L_1^2}</script><p>这样我们通过FW_L1_DAMPING参数设置了$\zeta$，即$\zeta$=FW_L1_DAMPING，程序中会自动计算出K来，其中 $\omega_n = \sqrt{K}\frac{V}{L_1}$，所以有：</p>
+<script type="math/tex; mode=display">
+\zeta 2\sqrt{K}=K===>K=4\zeta^2</script><p>同理我们通过FW_L1_PERIOD可以设置系统的自然周期，也就间接设定了系统的自然频率，注意到FW_L1_PERIOD的单位是s，所以：</p>
+<script type="math/tex; mode=display">
+\omega_n = \frac{2\pi}{T}=\frac{2\pi}{FW\underline{}L1\underline{}PERIOD}</script><p>我们之前已经通过参数确定了阻尼比$\zeta$，进而K也确定了，现在我们也确定了自然频率$\omega_n$，那么就可以通过当前速度计算出当前L1制导中使用的L1线段长度：</p>
+<script type="math/tex; mode=display">
+L_1=\frac{\sqrt{K}V}{\omega_n}=\frac{2\zeta V}{\omega_n}=\frac{FW\underline{}L1\underline{}PERIOD*FW\underline{}L1\underline{}DAMPING*V}{\pi}</script><p>这样处理之后就可以保证达到我们想要的系统阻尼比和自然频率了。PX4中该部分处理如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">void ECL_L1_Pos_Controller::set_l1_period(float period)</span><br><span class="line">&#123;</span><br><span class="line">	_L1_period &#x3D; period;</span><br><span class="line"></span><br><span class="line">	&#x2F;* calculate the ratio introduced in [2] *&#x2F;</span><br><span class="line">	_L1_ratio &#x3D; 1.0f &#x2F; M_PI_F * _L1_damping * _L1_period;</span><br><span class="line"></span><br><span class="line">	&#x2F;* calculate normalized frequency for heading tracking *&#x2F;</span><br><span class="line">	_heading_omega &#x3D; sqrtf(2.0f) * M_PI_F &#x2F; _L1_period;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void ECL_L1_Pos_Controller::set_l1_damping(float damping)</span><br><span class="line">&#123;</span><br><span class="line">	_L1_damping &#x3D; damping;</span><br><span class="line"></span><br><span class="line">	&#x2F;* calculate the ratio introduced in [2] *&#x2F;</span><br><span class="line">	_L1_ratio &#x3D; 1.0f &#x2F; M_PI_F * _L1_damping * _L1_period;</span><br><span class="line"></span><br><span class="line">	&#x2F;* calculate the L1 gain (following [2]) *&#x2F;</span><br><span class="line">	_K_L1 &#x3D; 4.0f * _L1_damping * _L1_damping;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>求L1长度：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;* calculate the L1 length required for the desired period *&#x2F;</span><br><span class="line">_L1_distance &#x3D; _L1_ratio * ground_speed;</span><br></pre></td></tr></table></figure>
+<p>求期望的切向加速度：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_lateral_accel &#x3D; _K_L1 * ground_speed * ground_speed &#x2F; _L1_distance * sinf(eta);</span><br></pre></td></tr></table></figure>
+<p><strong>以直线航点跟踪跟踪为例，px4代码中的跟踪逻辑为：</strong></p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210314232518732.png" alt="image-20210314232518732"></p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210314232619326.png" alt="image-20210314232619326"></p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210314232653192.png" alt="image-20210314232653192"></p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210314232731075.png" alt="image-20210314232731075"></p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210314232806102.png" alt="image-20210314232806102"></p>
+<h2 id="仿真"><a href="#仿真" class="headerlink" title="仿真"></a>仿真</h2><p>gazebo仿真下可以观察不同的FW_L1_PERIOD参数和FW_L1_DAMPING参数在飞行器拐入航线时的情况。</p>
+<h3 id="一、FW-L1-PERIOD不变"><a href="#一、FW-L1-PERIOD不变" class="headerlink" title="一、FW_L1_PERIOD不变"></a>一、FW_L1_PERIOD不变</h3><p>1、FW_L1_DAMPING  = 0.75，= FW_L1_PERIOD = 12</p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210308011239567.png" alt="image-20210308011239567"></p>
+<p>2、FW_L1_DAMPING  = 0.3，   FW_L1_PERIOD = 12</p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210308011318215.png" alt="image-20210308011318215"></p>
+<p>3、FW_L1_DAMPING  = 1.2，FW_L1_PERIOD = 12</p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210308011409628.png" alt="image-20210308011409628"></p>
+<h3 id="二、固定FW-L1-DAMPING不变"><a href="#二、固定FW-L1-DAMPING不变" class="headerlink" title="二、固定FW_L1_DAMPING不变"></a>二、固定FW_L1_DAMPING不变</h3><p>FW_L1_DAMPING  = 0.3， FW_L1_PERIOD = 12</p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210308012714748.png" alt="image-20210308012714748"></p>
+<p>FW_L1_DAMPING  = 0.3，= FW_L1_PERIOD = 3</p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210308012749433.png" alt="image-20210308012749433"></p>
+<p>FW_L1_DAMPING  = 0.3，=FW_L1_PERIOD = 50</p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210308013007999.png" alt="image-20210308013007999"></p>
+<p>放在同一张图下看：</p>
+<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210308013041161.png" alt="image-20210308013041161"></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/03/15/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%AF%BC%E8%88%AA%E7%AE%97%E6%B3%95/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
   
 
 
@@ -764,7 +995,7 @@
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2020 东边有棵树
+    		&copy; 2021 东边有棵树
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
