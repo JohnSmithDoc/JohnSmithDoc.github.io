@@ -6,43 +6,44 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>固定翼路径跟踪L1导航算法 | Hexo</title>
+  <title>固定翼路径跟踪L1制导律 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="固定翼路径跟踪L1导航算法当前PX4、Ardupilot中固定翼路径跟随算法主要基于L1导航算法实现   背景问题：存在目标航点B，期望的航线AB，其中A为上一个航点，B为当前目标航点，飞机位置在P点，如何使飞机一边贴近AB航线一边向B点靠近？  正常飞行中，飞机的位置P应该在AB的连线上，但由于某种扰动（如风的干扰），或者初始条件（飞机起飞时就不在AB航线上）导致飞机偏离了原本的AB航线，此时飞">
+  <meta name="description" content="固定翼路径跟踪L1导航算法">
 <meta property="og:type" content="article">
-<meta property="og:title" content="固定翼路径跟踪L1导航算法">
-<meta property="og:url" content="http://yoursite.com/2021/03/15/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%AF%BC%E8%88%AA%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:title" content="固定翼路径跟踪L1制导律">
+<meta property="og:url" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="固定翼路径跟踪L1导航算法当前PX4、Ardupilot中固定翼路径跟随算法主要基于L1导航算法实现   背景问题：存在目标航点B，期望的航线AB，其中A为上一个航点，B为当前目标航点，飞机位置在P点，如何使飞机一边贴近AB航线一边向B点靠近？  正常飞行中，飞机的位置P应该在AB的连线上，但由于某种扰动（如风的干扰），或者初始条件（飞机起飞时就不在AB航线上）导致飞机偏离了原本的AB航线，此时飞">
+<meta property="og:description" content="固定翼路径跟踪L1导航算法">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://camo.githubusercontent.com/c8bbdff5f40d1e2a0ee06174a504ab9dbd313b85a263e93abaa3373fd848a05b/68747470733a2f2f662e636c6f75642e6769746875622e636f6d2f6173736574732f323035343537382f3139303034302f34333662333061652d376563342d313165322d393061372d3031666365383731373339322e706e67">
 <meta property="og:image" content="https://camo.githubusercontent.com/59d699e76b157eedacdbe7a39c760ee70f4c1d2c0f77674d85513f76089e541b/68747470733a2f2f662e636c6f75642e6769746875622e636f6d2f6173736574732f323035343537382f3139303035392f66643535396233652d376563352d313165322d383538342d6432316532643831663935322e706e67">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210307141150660.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210307144823658.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210307153233904.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210307154124177.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210307170300355.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210307171942364.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210307172050571.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210307172212494.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210307172318001.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210307160303660.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210307182017793.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210314232518732.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210314232619326.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210314232653192.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210314232731075.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210314232806102.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210308011239567.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210308011318215.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210308011409628.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210308012714748.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210308012749433.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210308013007999.png">
-<meta property="og:image" content="c:/Users/yanggd/AppData/Roaming/Typora/typora-user-images/image-20210308013041161.png">
-<meta property="article:published_time" content="2021-03-15T14:47:31.065Z">
-<meta property="article:modified_time" content="2021-03-15T14:47:31.922Z">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307141150660.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307144823658.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307153233904.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307154124177.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307170300355.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307171942364.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307172050571.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307172212494.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307172318001.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307160303660.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307182017793.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210314232518732.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210314232619326.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210314232653192.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210314232731075.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210314232806102.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210308011239567.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210308011318215.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210308011409628.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210308012714748.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210308012749433.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210308013007999.png">
+<meta property="og:image" content="http://yoursite.com/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210308013041161.png">
+<meta property="article:published_time" content="2021-05-07T16:23:36.287Z">
+<meta property="article:modified_time" content="2021-05-07T17:09:01.650Z">
 <meta property="article:author" content="东边有棵树">
+<meta property="article:tag" content="随笔">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://camo.githubusercontent.com/c8bbdff5f40d1e2a0ee06174a504ab9dbd313b85a263e93abaa3373fd848a05b/68747470733a2f2f662e636c6f75642e6769746875622e636f6d2f6173736574732f323035343537382f3139303034302f34333662333061652d376563342d313165322d393061372d3031666365383731373339322e706e67">
   
@@ -194,14 +195,18 @@
           </div>
           <div id="js-content" class="content-ll">
             
-<article id="post-固定翼路径跟踪L1导航算法" class="article article-type-post " itemscope itemprop="blogPost">
+    <i class="fa fa-thumb-tack"></i>
+    <font color=7D26CD>置顶</font>
+    <span class="post-meta-divider">|</span>
+  
+<article id="post-固定翼路径跟踪L1制导律" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      固定翼路径跟踪L1导航算法
+      固定翼路径跟踪L1制导律
     </h1>
   
 
@@ -219,19 +224,20 @@
         <!--显示阅读次数完毕-->
 
         
-        <a href="/2021/03/15/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%AF%BC%E8%88%AA%E7%AE%97%E6%B3%95/" class="archive-article-date">
-  	<time datetime="2021-03-15T14:47:31.065Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-15</time>
+        <a href="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/" class="archive-article-date">
+  	<time datetime="2021-05-07T16:23:36.287Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-05-08</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="固定翼路径跟踪L1导航算法"><a href="#固定翼路径跟踪L1导航算法" class="headerlink" title="固定翼路径跟踪L1导航算法"></a>固定翼路径跟踪L1导航算法</h1><p>当前PX4、Ardupilot中固定翼路径跟随算法主要基于L1导航算法实现</p>
+        <h1 id="固定翼路径跟踪L1导航算法"><a href="#固定翼路径跟踪L1导航算法" class="headerlink" title="固定翼路径跟踪L1导航算法"></a>固定翼路径跟踪L1导航算法</h1><a id="more"></a>
+<p>当前PX4、Ardupilot中固定翼路径跟随算法主要基于L1导航算法实现</p>
 <p><img src="https://camo.githubusercontent.com/c8bbdff5f40d1e2a0ee06174a504ab9dbd313b85a263e93abaa3373fd848a05b/68747470733a2f2f662e636c6f75642e6769746875622e636f6d2f6173736574732f323035343537382f3139303034302f34333662333061652d376563342d313165322d393061372d3031666365383731373339322e706e67" alt="img"></p>
 <p><img src="https://camo.githubusercontent.com/59d699e76b157eedacdbe7a39c760ee70f4c1d2c0f77674d85513f76089e541b/68747470733a2f2f662e636c6f75642e6769746875622e636f6d2f6173736574732f323035343537382f3139303035392f66643535396233652d376563352d313165322d383538342d6432316532643831663935322e706e67" alt="img"></p>
 <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>问题：存在目标航点B，期望的航线AB，其中A为上一个航点，B为当前目标航点，飞机位置在P点，如何使飞机一边贴近AB航线一边向B点靠近？</p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307141150660.png" alt="image-20210307141150660"></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307141150660.png" alt="image-20210307141150660"></p>
 <p>正常飞行中，飞机的位置P应该在AB的连线上，但由于某种扰动（如风的干扰），或者初始条件（飞机起飞时就不在AB航线上）导致飞机偏离了原本的AB航线，此时飞机要飞到B点，有如下两种方式：</p>
 <ul>
 <li>从当前P点直接朝B点飞行，飞图中直红线</li>
@@ -244,22 +250,22 @@ L_1----连接飞行器位置和目标路径上参考点的线段\\
 \eta----从V到L_1的角度(顺时针方向为正)\\
 a_{s_{cmd}}----横向加速度指令，与飞行器速度方向垂直\\
 d----航迹误差，飞行器当前位置距航线的垂直距离\\
-R----圆或者圆弧的半径\\</script><h2 id="初探L1制导律"><a href="#初探L1制导律" class="headerlink" title="初探L1制导律"></a>初探L1制导律</h2><p>L1制导律在目标路径上选择一个参考点，利用该参考点给出一个横向加速度指令$a_{s_{cmd}}$来使飞机的潜在路径实时经过参考点。飞机位置和参考点的连线即为L1，这也是L1制导律名字来源。之后的公式和主要图片来源于如下论文：<a href="http://acl.mit.edu/papers/gnc_park_deyst_how.pdf" target="_blank" rel="noopener">http://acl.mit.edu/papers/gnc_park_deyst_how.pdf</a></p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307144823658.png" alt="image-20210307144823658"></p>
+R----圆或者圆弧的半径\\</script><h2 id="初探L1制导律"><a href="#初探L1制导律" class="headerlink" title="初探L1制导律"></a>初探L1制导律</h2><p>L1制导律在目标路径上选择一个参考点，利用该参考点给出一个横向加速度指令$a<em>{s</em>{cmd}}$来使飞机的潜在路径实时经过参考点。飞机位置和参考点的连线即为L1，这也是L1制导律名字来源。之后的公式和主要图片来源于如下论文：<a href="http://acl.mit.edu/papers/gnc_park_deyst_how.pdf" target="_blank" rel="noopener">http://acl.mit.edu/papers/gnc_park_deyst_how.pdf</a></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307144823658.png" alt="image-20210307144823658"></p>
 <p>横向加速度计算如下：</p>
 <script type="math/tex; mode=display">
 sin(\eta)=\frac{0.5L_1}{R}
-\\a_{s_{cmd}} = \frac{V^2}{R}=\frac{V^2}{\frac{L_1}{2sin(\eta)}}=2\frac{V^2}{L_1}sin(\eta)</script><p>通过实时更新参考点位置就可以实时更新$a_{s_{cmd}}$来使得飞行器的轨迹逐渐切入目标路径：</p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307153233904.png" alt="image-20210307153233904"></p>
+\\a_{s_{cmd}} = \frac{V^2}{R}=\frac{V^2}{\frac{L_1}{2sin(\eta)}}=2\frac{V^2}{L_1}sin(\eta)</script><p>通过实时更新参考点位置就可以实时更新$a<em>{s</em>{cmd}}$来使得飞行器的轨迹逐渐切入目标路径：</p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307153233904.png" alt="image-20210307153233904"></p>
 <p>上面的离散点表示中可以看到，飞行器总是趋向于<strong>速度方向</strong>和<strong>L1线段方向</strong>对齐，而<strong>L1线段</strong>逐渐和<strong>目标路径</strong>对齐，进而间接带动飞行器最终速度方向也和目标路径对齐。最终飞回至直线上去，会变为如下情况：</p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307154124177.png" alt="image-20210307154124177"></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307154124177.png" alt="image-20210307154124177"></p>
 <p>这也可以从加速度方向看出，当$\eta$大于0时，会产生向右加速的指令，来使飞行器速度方向对齐L1，$\eta$小于0时同理。</p>
 <h2 id="两种情形下的L1制导律"><a href="#两种情形下的L1制导律" class="headerlink" title="两种情形下的L1制导律"></a>两种情形下的L1制导律</h2><p>固定翼实际飞行中的路径跟踪主要可分为两种情况：</p>
 <ol>
 <li>跟踪一条直线（常见）</li>
 <li>跟踪一条圆形路径</li>
 </ol>
-<h3 id="弹簧质量阻尼系统"><a href="#弹簧质量阻尼系统" class="headerlink" title="弹簧质量阻尼系统"></a>弹簧质量阻尼系统</h3><p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307170300355.png" alt="image-20210307170300355"></p>
+<h3 id="弹簧质量阻尼系统"><a href="#弹簧质量阻尼系统" class="headerlink" title="弹簧质量阻尼系统"></a>弹簧质量阻尼系统</h3><p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307170300355.png" alt="image-20210307170300355"></p>
 <p>作简单的受力分析可得到：</p>
 <script type="math/tex; mode=display">
 ma=m\ddot{x}=F-Kx-B\dot{x}</script><p>即：</p>
@@ -292,14 +298,14 @@ x(t)=e^{-\zeta\omega_nt}(C_1cos\omega_n\sqrt{1-\zeta^2}t+C_2sin\omega_n\sqrt{1-\
 <p>在初始条件不为0时，没有外力输入，则不同的阻尼比会有不同的响应，假设初始的$x=x_0$，$\dot{x}=0$，其实就相当于手将质量块M向右拉动值$x_0$处，然后松手，看$x$如何变化。以阻尼比的不同可有如下响应情况：</p>
 <ul>
 <li>$\zeta&gt;1$，过阻尼：</li>
-<li><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307171942364.png" alt="image-20210307171942364"></li>
-<li>$\zeta=1$，临界阻尼：<img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307172050571.png" alt="image-20210307172050571"></li>
-<li>$0&lt;\zeta&lt;1$，欠阻尼，这个振动的频率就是$\omega_d$：<img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307172212494.png" alt="image-20210307172212494"></li>
-<li>$\zeta=0$，无阻尼，此时这个正弦的频率就是$\omega_n$：<img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307172318001.png" alt="image-20210307172318001"></li>
+<li><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307171942364.png" alt="image-20210307171942364"></li>
+<li>$\zeta=1$，临界阻尼：<img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307172050571.png" alt="image-20210307172050571"></li>
+<li>$0&lt;\zeta&lt;1$，欠阻尼，这个振动的频率就是$\omega_d$：<img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307172212494.png" alt="image-20210307172212494"></li>
+<li>$\zeta=0$，无阻尼，此时这个正弦的频率就是$\omega_n$：<img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307172318001.png" alt="image-20210307172318001"></li>
 <li>$-1&lt;\zeta&lt;0$，这种情况就直接发散了。</li>
 </ul>
 <h3 id="一、跟踪一条直线"><a href="#一、跟踪一条直线" class="headerlink" title="一、跟踪一条直线"></a>一、跟踪一条直线</h3><p>仍统一使用之前的符号说明，假设$\eta$角很小，这在航路飞行中的大部分时间都是满足的。</p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307160303660.png" alt="image-20210307160303660"></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307160303660.png" alt="image-20210307160303660"></p>
 <p>由于$\eta$很小，所以：</p>
 <script type="math/tex; mode=display">
 sin(\eta)\approx\eta=\eta_1+\eta_2</script><p>而且由于$\eta_1$和$\eta_2$很小，所以有：</p>
@@ -312,7 +318,7 @@ sin(\eta)\approx\eta=\eta_1+\eta_2</script><p>而且由于$\eta_1$和$\eta_2$很
 a_{s_{cmd}} = - \ddot{d}</script><p>进而可写成到：</p>
 <script type="math/tex; mode=display">
 \ddot{d}+2\zeta\omega_n\dot{d}+{\omega_n^2}d=0</script><p>其中$\zeta = \frac{1}{\sqrt{2}}\approx0.707$，$\omega_n=\frac{\sqrt{2}V}{L_1}$，这表明直线跟踪情况</p>
-<h3 id="二、跟踪一条圆形路径"><a href="#二、跟踪一条圆形路径" class="headerlink" title="二、跟踪一条圆形路径"></a>二、跟踪一条圆形路径</h3><p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210307182017793.png" alt="image-20210307182017793"></p>
+<h3 id="二、跟踪一条圆形路径"><a href="#二、跟踪一条圆形路径" class="headerlink" title="二、跟踪一条圆形路径"></a>二、跟踪一条圆形路径</h3><p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210307182017793.png" alt="image-20210307182017793"></p>
 <p>圆弧路径跟踪情况如上图，假设$\eta_1$和$\eta_2$都很小，飞行器的当前位置取决于R+d和$\theta$，而$\psi$决定了飞行器当前速度矢量的方向。因为：</p>
 <script type="math/tex; mode=display">
 \psi+\eta_2=\theta+\frac{\pi}{2}</script><p>所以：</p>
@@ -371,26 +377,26 @@ L_1=\frac{\sqrt{K}V}{\omega_n}=\frac{2\zeta V}{\omega_n}=\frac{FW\underline{}L1\
 <p>求期望的切向加速度：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_lateral_accel &#x3D; _K_L1 * ground_speed * ground_speed &#x2F; _L1_distance * sinf(eta);</span><br></pre></td></tr></table></figure>
 <p><strong>以直线航点跟踪跟踪为例，px4代码中的跟踪逻辑为：</strong></p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210314232518732.png" alt="image-20210314232518732"></p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210314232619326.png" alt="image-20210314232619326"></p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210314232653192.png" alt="image-20210314232653192"></p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210314232731075.png" alt="image-20210314232731075"></p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210314232806102.png" alt="image-20210314232806102"></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210314232518732.png" alt="image-20210314232518732"></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210314232619326.png" alt="image-20210314232619326"></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210314232653192.png" alt="image-20210314232653192"></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210314232731075.png" alt="image-20210314232731075"></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210314232806102.png" alt="image-20210314232806102"></p>
 <h2 id="仿真"><a href="#仿真" class="headerlink" title="仿真"></a>仿真</h2><p>gazebo仿真下可以观察不同的FW_L1_PERIOD参数和FW_L1_DAMPING参数在飞行器拐入航线时的情况。</p>
 <h3 id="一、FW-L1-PERIOD不变"><a href="#一、FW-L1-PERIOD不变" class="headerlink" title="一、FW_L1_PERIOD不变"></a>一、FW_L1_PERIOD不变</h3><p>1、FW_L1_DAMPING  = 0.75，= FW_L1_PERIOD = 12</p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210308011239567.png" alt="image-20210308011239567"></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210308011239567.png" alt="image-20210308011239567"></p>
 <p>2、FW_L1_DAMPING  = 0.3，   FW_L1_PERIOD = 12</p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210308011318215.png" alt="image-20210308011318215"></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210308011318215.png" alt="image-20210308011318215"></p>
 <p>3、FW_L1_DAMPING  = 1.2，FW_L1_PERIOD = 12</p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210308011409628.png" alt="image-20210308011409628"></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210308011409628.png" alt="image-20210308011409628"></p>
 <h3 id="二、固定FW-L1-DAMPING不变"><a href="#二、固定FW-L1-DAMPING不变" class="headerlink" title="二、固定FW_L1_DAMPING不变"></a>二、固定FW_L1_DAMPING不变</h3><p>FW_L1_DAMPING  = 0.3， FW_L1_PERIOD = 12</p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210308012714748.png" alt="image-20210308012714748"></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210308012714748.png" alt="image-20210308012714748"></p>
 <p>FW_L1_DAMPING  = 0.3，= FW_L1_PERIOD = 3</p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210308012749433.png" alt="image-20210308012749433"></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210308012749433.png" alt="image-20210308012749433"></p>
 <p>FW_L1_DAMPING  = 0.3，=FW_L1_PERIOD = 50</p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210308013007999.png" alt="image-20210308013007999"></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210308013007999.png" alt="image-20210308013007999"></p>
 <p>放在同一张图下看：</p>
-<p><img src="C:\Users\yanggd\AppData\Roaming\Typora\typora-user-images\image-20210308013041161.png" alt="image-20210308013041161"></p>
+<p><img src="/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/image-20210308013041161.png" alt="image-20210308013041161"></p>
 
       
 
@@ -429,7 +435,23 @@ L_1=\frac{\sqrt{K}V}{\omega_n}=\frac{2\zeta V}{\omega_n}=\frac{FW\underline{}L1\
     </div>
     <div class="article-info article-info-index">
       
+        <div class="article-pop-out tagcloud">
+          <i class="icon-tuding"></i>
+          <a class="article-tag-list-link color3">置顶</a>
+        </div>
       
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 
       
@@ -480,7 +502,7 @@ L_1=\frac{\sqrt{K}V}{\omega_n}=\frac{2\zeta V}{\omega_n}=\frac{FW\underline{}L1\
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://JohnSmithDoc.github.io/2021/03/15/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%AF%BC%E8%88%AA%E7%AE%97%E6%B3%95/" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://JohnSmithDoc.github.io/2021/05/08/%E5%9B%BA%E5%AE%9A%E7%BF%BC%E8%B7%AF%E5%BE%84%E8%B7%9F%E8%B8%AAL1%E5%88%B6%E5%AF%BC%E5%BE%8B/" alt="微信分享二维码">
     </div>
 </div>
 

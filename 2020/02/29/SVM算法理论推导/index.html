@@ -225,7 +225,7 @@ L(w,\alpha,\beta)=f(w)+ \sum_{i=1}^K\alpha_ig_i(w)+\sum_{i=1}^M\beta_ih_i(w)\tag
 <script type="math/tex; mode=display">
 L(w,\alpha,\beta)=f(w)+\alpha^Tg(w)+\beta^Th(w) \tag{4}</script><p>公式$(3)$中$\alpha^T$和$g(w)$都是$K$维的，而$\beta^T$和$h(w)$都是$M$维的。<strong>则原问题的对偶问题为</strong>：</p>
 <script type="math/tex; mode=display">
-最大化\quad\theta(\alpha,\beta)=\inf \limits_{所有w}\{~L(w,\alpha,\beta)~\}\\限制条件：\alpha_i~\ge~0\quad(i=1\cdots K)\tag{5}</script><p>其中$\inf \limits_{所有w}\{~L(w,\alpha,\beta)~\}$的意思是在限制$\alpha$和$\beta$的情况下遍历所有的$w$求最小值，即每确定一个$\alpha$和$\beta$都能算出一个最小值，即每一个$\alpha$和$\beta$都对应一个值，很明显，这是$\alpha$和$\beta$的函数，故写作$\theta(\alpha,\beta)$。那么公式$(4)$是针对所有的$\alpha$和$\beta$求最大值，即在所有的最小值中找最大的。</p>
+最大化\quad\theta(\alpha,\beta)=\inf \limits_{所有w}\{~L(w,\alpha,\beta)~\}\\限制条件：\alpha_i~\ge~0\quad(i=1\cdots K)\tag{5}</script><p>其中$\inf \limits_{所有w}{~L(w,\alpha,\beta)~}$的意思是在限制$\alpha$和$\beta$的情况下遍历所有的$w$求最小值，即每确定一个$\alpha$和$\beta$都能算出一个最小值，即每一个$\alpha$和$\beta$都对应一个值，很明显，这是$\alpha$和$\beta$的函数，故写作$\theta(\alpha,\beta)$。那么公式$(4)$是针对所有的$\alpha$和$\beta$求最大值，即在所有的最小值中找最大的。</p>
 <p>我们发现原问题和对偶问题的定义中原问题的限制条件都是小于等于0的，所以为了更好的进行改写，我们也需要对支持向量机的原问题，即公式$(1)$进行适当的改写，这样就可以很方便的写出其对偶问题。我们看到，$(1)$ 中的限制条件都是大于等于0的，我们要将他们改成小于等于0的，以此对应于$(2)$中的${g_i(w)\leq 0}$。具体改法如下：</p>
 <script type="math/tex; mode=display">
 {首先将\xi_i \ge0 改为\xi_i \leq0\\
